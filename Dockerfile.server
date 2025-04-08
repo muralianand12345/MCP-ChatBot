@@ -1,0 +1,23 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+RUN pip install --no-cache-dir mcp[cli] fastmcp pydantic "requests>=2.32.3"
+
+# Create mcp_servers directory
+RUN mkdir -p /app/servers
+
+# Set environment variables
+ENV PYTHONPATH=/app
+
+# Expose port for the server
+EXPOSE 8001
+
+# We'll mount the actual server files as volumes in docker-compose
+CMD ["python", "/app/servers/server.py"]

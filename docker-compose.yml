@@ -1,0 +1,36 @@
+services:
+    # MCP Server (Weather Service)
+    mcp_server:
+        build:
+            context: .
+            dockerfile: Dockerfile.server
+        ports:
+            - "8001:8001"
+        env_file:
+            - .env
+        command: python /app/servers/server.py
+        volumes:
+            - ./servers:/app/servers
+        networks:
+            - mcp_network
+
+    # Streamlit Client
+    streamlit:
+        build:
+            context: .
+            dockerfile: Dockerfile.client
+        ports:
+            - "8501:8501"
+        env_file:
+            - .env
+        command: streamlit run client.py
+        depends_on:
+            - mcp_server
+        volumes:
+            - ./client.py:/app/client.py
+        networks:
+            - mcp_network
+
+networks:
+    mcp_network:
+        driver: bridge
